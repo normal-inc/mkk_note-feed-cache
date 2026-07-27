@@ -6,6 +6,11 @@ on:
     - cron: '0 * * * *'
   workflow_dispatch: {}
 
+# 同時に複数走らせない（re-runや実行タイミングの重なりによるpush競合を防ぐ）
+concurrency:
+  group: update-note-feed
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
@@ -28,4 +33,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/
           git diff --cached --quiet && echo "no changes" || git commit -m "chore: update note feed cache $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git pull --rebase origin main
           git push
